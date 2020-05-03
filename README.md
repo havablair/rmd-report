@@ -1,4 +1,4 @@
-#"Sharing Soil Health Data with Reproducible Reports"  
+# "Sharing Soil Health Data with Reproducible Reports"  
 
 This website features materials from the webinar presented to the Soil Health Nexus group on May 6, 2020 by Hava Blair and Dr. Anna Cates.
 
