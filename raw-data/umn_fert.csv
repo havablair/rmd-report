@@ -1,0 +1,8 @@
+﻿Level,Phosphorus,Phosphorus,Potassium
+,Bray/Mehlich III,Olsen,
+,ppm,ppm,ppm
+Very low (VL),0-5,0-3,0-40
+Low (L),11-Jun,7-Apr,41-80
+Medium (M),15-Dec,11-Aug,81-120
+High (H),16-20,15-Dec,121-160
+Very high (VH) ,21+,16+,161+

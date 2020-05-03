@@ -1,0 +1,266 @@
+---
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+header-includes: 
+  - \usepackage{fontspec}
+  - \setmainfont[SizeFeatures={Size=12}]{Calibri}
+params:
+  farmer: Bob-Barley
+  region: SW
+---
+
+```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(png)
+library(knitr)
+library(kableExtra)
+library(grid)
+library(glue)
+library(tigris)
+library(dplyr)
+library(gridExtra)
+library(grid)
+library(lattice)
+library(RGraphics)
+library(multipanelfigure)
+library(stringr)
+library(ggrepel)
+
+farmer.name <- params$farmer
+reg <- params$region
+report_title <- "Soil Health Project Update"
+
+```
+
+```{r, echo=FALSE, fig.align='right'}
+
+#this is one way to include a graphic
+knitr::include_graphics('./images/mosh-stacked2.png')
+```
+
+
+## `r report_title` 
+
+
+`r format(Sys.time(), '%B %d, %Y')`
+
+
+[This is an example of the type of report we are generating for cooperators participating in our research.]
+
+Thank you for participating in year 1 of our soil health research project. In year 1, we collected soil samples from all 27 participating farms.  This year, we will collect another set of soil samlpes in October-November.  Our original research plan also included infiltration measurements to be performed on all participating farms in May - June of this year.  However, due to safety concerns and travel restrictions imposed by COVID-19, we are currently evaluating the feasibility of performing these measurements.  We will communicate with you when we have more information about these infiltration measurements.  
+
+Our main goal is to gather repsentative soil data from working farms with a range of locations, soil types, and management practices.  This data will serve as an important baseline to help us evaluate the effectiveness of specific soil health tests for monitoring soil changes.  Our work would not be possible without participation from cooperators like you - thank you!    
+
+This report includes preliminary data year 1 data for the following soil tests: 
+
++  Soil organic matter %
++  pH 
++  Phosphorus (P)
++  Potassium (K) 
++  Potentially mineralizable nitrogen (PMN)
+
+```{r, cig-map, fig.asp=0.5, message=FALSE, warning=FALSE, echo=FALSE}
+#Using tigris package to create a MN counties map
+
+#allow tigris cache 
+options(tigris_use_cache = TRUE)
+
+#set sf (shapefile) option
+options(tigris_class = "sf")
+
+#grab 1:500k counties file (set with cb=T parameter)
+mn <- counties("MN", cb=T, progress_bar = FALSE)
+
+#Make a dataframe to store info about which counties have CIG farms
+CIG.CTY <- list(1:nrow(mn))
+CIG.CTY <- as.data.frame(CIG.CTY)
+colnames(CIG.CTY)[1] = "number"
+CIG.CTY$NAME = mn$NAME
+
+#Read in a list of participating county names
+focus.cty <- read.csv("./raw-data/cig-cty.csv", stringsAsFactors = FALSE)
+colnames(focus.cty) <- c("NAME", "FOCUS.Y.N")
+
+#Add participating counties with flag "Y" in FOCUS.Y.N column.
+for.cig <- full_join(CIG.CTY, focus.cty, by = "NAME")
+
+#Add focus county data 
+mn.merge <- full_join(mn, for.cig, by = "NAME")
+
+#Create map 
+cig.map <- ggplot(mn.merge) +
+  geom_sf(aes(fill = FOCUS.Y.N, geometry = NULL), show.legend = FALSE) + 
+  theme_void() + 
+  theme(panel.grid.major = element_line(colour = 'white')) +
+  labs(title = "Locations of Participating Farms")
+
+#Create activity table
+actv_tbl <- read.csv("./raw-data/activity_table.csv", stringsAsFactors = FALSE)
+colnames(actv_tbl) = c("Activity", "Expected Timeline")
+actv_tbl <- as.data.frame(actv_tbl)
+
+grob.actv <- tableGrob(actv_tbl, rows = NULL, theme = ttheme_default(base_size = 10, padding = unit(c(4,4),"mm")))
+
+grid.arrange(cig.map, grob.actv, ncol=2, top = textGrob("Future Research Activities", gp = gpar(fontsize = 13), hjust = -0.25, vjust = 2.5), newpage = FALSE)
+```
+\newpage
+
+# Research Design 
+```{r, fig.asp = 0.4, echo =  FALSE, warning = FALSE, message = FALSE}
+field.img <- rasterGrob(readPNG(glue("./images/{farmer.name}.png")))
+legend.img <- rasterGrob(readPNG("./images/legend.png"))
+
+fig1 <- multi_panel_figure(
+  width = c(5, 2),
+  height = c(2.5),
+  rows = 1,
+  column_spacing = 0,
+  row_spacing = 0,
+  unit = "inches",
+  panel_label_type = "none")
+
+fig1 <- fill_panel(fig1, field.img)
+fig1
+```
+  
+**What is preliminary data?**  
+The data we are sharing with you today represent just a fraction of what we will eventually analyze and share.  We are still running additional tests in the laboratory, including some re-runs for quality control purposes.  If you notice data missing in the graphs below, please understand that we expect to have full results for each farm by the end of the 2.5 year project.  It is possible that one or two samples from your farm are being re-tested or run in our next round of tests.  
+
+
+**Where We Sampled**  
+At each farm we visited, we looked for two different soil types to sample in the field.  You will see these marked "A" and "B" in the field image above.  In general, the "A" samples are taken from relatively well-drained, upper slope locations.  The "B" samples are taken from lower, less well-drained areas.  In the Red River Valley, where there is very little topography to distinguish "upper" and "lower", the "A" and "B" refer to soil types with relatively less clay (A) and relatively more clay (B).  We chose this design because we want to understand how variable soil health measurements can be within a given field or section.  
+
+When available, we also took a sample from a relatively undisturbed "natural area" such as a tree line, grassed fenceline, or other place with the same soil type as our field samples.  We took these samples as a reference, especially for biological soil health indicators.  In most cases, we would not expect field samples and natural area samples to be the same - these are two different types of land use.  An undisturbed area with perennial vegetation incorporates more of the soil health principles of low disturbance, plant diversity, and year-round ground cover, so we expect most biological indicators to be higher.  We recommend you view the results from nearby natural areas as evidence of your soil's *potential* for biological activity.  It can be instructive to use soil health tests over time to understand if your soil is improving more toward its potential. 
+
+If you don't see a "your natural area" sample in your sample map or the graphs below, this means we had to find the right soil type elsewhere, either at a neighboring farm or another nearby natural area.  In this case, you will still see  average test results for natural areas in your region in the graphs below. 
+
+
+**Future Tests**  
+You can expect results for additional soil health tests in the future.  We currently plan to analyze all soil samples for these additional soil health indicators:  microbial biomass, C:N ratios, extracellular enzyme activities, phospholipid fatty acid profiles of the soil microbial community, soil protein N concentration, aggregate stability, texture (sand/silt/clay), and active carbon (permanganate oxidizable carbon).  
+
+
+\newpage
+#Soil Organic Matter 
+```{r, som-fig, echo= FALSE, warning = FALSE, message = FALSE}
+
+source('./scripts/som.R')
+
+make_som_graph(reg, farmer.name)
+```
+
+###What is organic matter?
+Total soil organic matter (OM) consists of both living and dead material in the soil, including well decomposed, more stabilized materials. The percent organic matter is determined by loss on ignition, based on the change in mass after a soil is exposed to high temperature (500 °C or 932°F) in a furnace. At these temperatures, carbon-rich materials are burned off (oxidized to CO~2~), while other materials (such as minerals) remain. 
+
+###How organic matter relates to soil function
+Soil organic matter is where soil carbon is stored, and is directly derived from biomass of microbial communities in the soil (bacterial, fungal, and protozoan), as well as from plant roots and detritus, and biomass-containing amendments like manure, green manures, mulches, composts, and crop residues. OM acts as a long-term carbon sink, and as a slow-release pool for nutrients, providing energy to the plant and soil microbial communities. It cements soil particles into aggregates which can both improve infiltration and water holding capacity. A large portion of OM adheres to mineral particles, so the soil's capacity to store OM is based on soil texture. When soil is not disturbed, more OM builds up both within aggregates and free-floating in the soil matrix.
+\newpage
+
+#Soil pH 
+```{r, ph-bar, echo= FALSE, warning = FALSE, message = FALSE, fig.asp = 0.25}
+
+source('./scripts/ph.R')
+
+ph_bar
+```
+
+Soil pH is a measure of whether the soil is acid, neutral, or alkaline.  Soil pH controls how available nutrients are to crops.  It is affected by both natural factors and management factors.  Natural factors include the parent material your soil developed from, historical precipitation levels, and the infiltration rate of your soil.  Management factors that impact pH include the application of lime, fertilizer type and quantity, and others.
+
+Soil pH is measured by mixing two parts water to one part soil and measuring the solution with a pH electrode probe. Optimum pH is around 6.2-6.8 for most crops (exceptions include potatoes and blueberries, which grow best in more acidic soil). If pH is too high, nutrients such as phosphorus, iron, manganese, copper and boron become unavailable to the crop. If pH is too low, calcium, magnesium, phosphorus, potassium and molybdenum become unavailable. Lack of nutrient availability will limit crop yields and quality. Aluminum toxicity can also be a concern in low pH soils, which can severely decrease root growth and yield, and in some cases lead to accumulation of aluminum and other metals in crop tissue. In general, as soil organic matter increases, crops can tolerate lower soil pH. Soil pH also influences the ability of certain pathogens to thrive, and of beneficial organisms to effectively colonize roots. 
+
+As a general rule, in the state of Minnesota we expect to observe somewhat higher (more basic) pH in the western parts of the state.
+
+```{r, echo = FALSE, message=FALSE, warning=FALSE, fig.height=4, fig.asp = 0.6}
+make_ph_graph(reg, farmer.name)
+```
+
+\newpage
+
+#Phosphorus
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.height=4.5}
+source('./scripts/p_ols_levels.R')
+source('./scripts/p_bray_levels.R')
+
+
+if (reg == "RR") {
+    make_p_bray(reg, farmer.name)
+  } else {
+    make_p_olsen(reg, farmer.name)
+  }
+```
+
+Extractable phosphorus is a measure of phosphorus (P) availability to a crop.  The type of P test (Bray or Olsen) appropriate for your soil depends on pH.  Following University of Minnesota guidance, we have reported Bray P results for farms with soil pH > 7.5 and Olsen P results for farms with soil pH < 7.5.
+
+P is an essential plant macronutrient, as it plays a role in photosynthesis, respiration, energy storage and transfer, cell division, cell enlargement, and several other process in plants. Its availability varies with soil pH and mineral composition. Low P values indicate poor P availability to plants. Excessively high P values indicate a risk of adverse environmental impact. P can be considered a contaminant and runoff of P into fresh surface water will cause damage through eutrophication. For this reason, over-application is strongly discouraged, especially close to surface water, on slopes, and on large scales.  For a general understanding of what constitutes a "Low" or "High" value, see the next page for more information from the University of Minnesota's calibrations.  
+\newpage
+
+#Potassium
+
+```{r, echo = FALSE, message=FALSE, warning=FALSE, fig.height = 4.5}
+source("./scripts/k.R")
+
+make_k_graph(reg, farmer.name)
+```
+
+Extractable potassium is a measure of potassium (K) availability to the crop. K is an essential plant macronutrient that plays a role in photosynthesis, respiration, energy storage and transfer, regulation of water uptake and loss, protein synthesis, activation of growth related enzymes, and other processes. Plants with higher potassium tend to be more tolerant of frost and cold. Thus, good potassium levels may help with season extension. While soil pH only marginally affects K availability, K is easily leached from sandy soils and is only weakly held by increased OM, so that applications of the amount removed by the specific crop being grown are generally necessary in such soils.
+
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.asp = 0.3}
+
+fert.tbl <- data.frame("Level" = c("   ", "   ", "Very low (VL)", "Low (L)", "Medium (M)", "High (H)", "Very High (VH)"), "P-Bray/Mehlich III" = c("Bray/Mehlich III", "ppm","0-5", "6-11", "12-15", "16-20", "21+"), "P-Olsen" = c("Olsen", "ppm", "0-3", "4-7", "8-11", "12-15", "16+"), "Potassium" = c("   ", "ppm", "0-40", "41-80", "81-120", "121-160", "161+"))
+
+colnames(fert.tbl) = c("Level", "Phosphorus (P)", "Phosphrous", "Potassium (K)")
+
+fert.grob <- tableGrob(fert.tbl, rows = NULL, theme = ttheme_default(base_size = 10, padding = unit(c(2,2),"mm")))
+
+fert.grob$widths <- unit(rep(1/ncol(fert.grob), ncol(fert.grob)), "npc")
+
+grid.arrange(fert.grob, ncol=1, top = "Relative Nutrient Levels for Phosphorus and Potassium", newpage = FALSE)
+
+```
+
+
+\newpage
+
+#Potentially Mineralizable Nitrogen (PMN)
+```{r, echo= FALSE, warning = FALSE, message = FALSE}
+
+source('./scripts/pmn.R')
+
+make_pmn_graph(reg, farmer.name)
+```
+
+###Potentially Mineralizable Nitrogen
+
+Potentially Mineralizable Nitrogen is an indicator of the capacity of the soil microbial community to convert (mineralize) nitrogen tied up in organic residues into the plant available form of ammonium. To measure PMN, soil samples are anaerobically incubated for 7 days, and the amount of ammonium produced in that period is measured as an indicator of the soil microbes' capacity to transform organic N into plant-available N. 
+
+###How PMN relates to soil function 
+
+Nitrogen is the most limiting nutrient for plant growth and yield in most agricultural situations. Almost all of the nitrogen stored in crop residues, soil organic matter, manures and composts is in the form of organic molecules (such as proteins) that are not directly available to plants. We rely on several microbial species in the soil to convert this organic nitrogen into the ammonium and nitrate forms that plant roots can utilize. The PMN test doesn't predict how much plant-available N will be released over the season. It's like a fitness test for microbes, showing the capacity of the soil biota to recycle organic nitrogen into plant available forms. Since plant-available N is water-soluble and leaves the profile rapidly, we can't rely on storing it for the long term. Still, high PMN indicates you have plenty of organic N, and microbes with the capacity to transform it. 
+\newpage
+
+#Contact with questions:  
+
+This is an example report with a test dataset for the purposes of sharing how to create reports using R Markdown. 
+
+###University of Minnesota  
+
+Hava Blair, Graduate Student  
+blair304@umn.edu or (612) 513-4301 
+
+Dr. Anna Cates, State Soil Health Specialist - Minnesota Office of Soil Health  
+catesa@umn.edu or (612) 625-3135
+
+###Acknowledgements:  
+
+Portions of the explanatory text in this report were modified from:  
+
+Moebius-Clune, B.N. et al. (2016). Comprehensive Assessment of Soil Health - The Cornell Framework, Edition 3.2, Cornell University, Geneva, NY.  
+
+This research is funded by a Conservation Innovation Grant from the Natural Resources Conservation Service (NRCS) to the University of Minnesota Office for Soil Health, in partnership with University Extension and the Department of Soil Water and Climate.
+
