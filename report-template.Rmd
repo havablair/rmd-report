@@ -1,9 +1,9 @@
 ---
 output:
-  pdf_document:
-    latex_engine: xelatex
   html_document:
     df_print: paged
+  pdf_document:
+    latex_engine: xelatex
 header-includes: 
   - \usepackage{fontspec}
   - \setmainfont[SizeFeatures={Size=12}]{Calibri}
