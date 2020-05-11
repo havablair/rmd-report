@@ -2,6 +2,8 @@
 
 On May 6, 2020, I gave a webinar hosted by Soil Health Nexus to discuss how I created reproducible (and automated!) reports using R and R Markdown. This repo contains supporting materials and examples for anyone interested in producing their own reports using R Markdown and the very handy parameters feature!
 
+You can watch a recording of the webinar [here.](https://soilhealthnexus.org/sharing-soil-health-data-with-reproducible-reports/)
+
 Creating a parameterized report template in R Markdown allowed me to produce individualized reports with soil data for 27 farmers participating in my research project.  A similar model could be applied by anyone who wants to create versions of the same general report with different input values.
 
  In this repo you can find: 
