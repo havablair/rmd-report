@@ -13,6 +13,11 @@ params:
 ---
 
 ```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
+
+farmer.name <- params$farmer
+reg <- params$region
+report_title <- "Soil Health Project Update"
+
 library(ggplot2)
 library(png)
 library(knitr)
@@ -28,10 +33,6 @@ library(RGraphics)
 library(multipanelfigure)
 library(stringr)
 library(ggrepel)
-
-farmer.name <- params$farmer
-reg <- params$region
-report_title <- "Soil Health Project Update"
 
 ```
 
@@ -110,6 +111,7 @@ grid.arrange(cig.map, grob.actv, ncol=2, top = textGrob("Future Research Activit
 
 # Research Design 
 ```{r, fig.asp = 0.4, echo =  FALSE, warning = FALSE, message = FALSE}
+#read in aerial field images and legend as pngs
 field.img <- rasterGrob(readPNG(glue("./images/{farmer.name}.png")))
 legend.img <- rasterGrob(readPNG("./images/legend.png"))
 
@@ -145,6 +147,7 @@ You can expect results for additional soil health tests in the future.  We curre
 \newpage
 #Soil Organic Matter 
 ```{r, som-fig, echo= FALSE, warning = FALSE, message = FALSE}
+#call external som script and create som graph 
 
 source('./scripts/som.R')
 
@@ -160,7 +163,7 @@ Soil organic matter is where soil carbon is stored, and is directly derived from
 
 #Soil pH 
 ```{r, ph-bar, echo= FALSE, warning = FALSE, message = FALSE, fig.asp = 0.25}
-
+#call external ph script and create ph bar visual (acid/netural/base)
 source('./scripts/ph.R')
 
 ph_bar
@@ -173,6 +176,7 @@ Soil pH is measured by mixing two parts water to one part soil and measuring the
 As a general rule, in the state of Minnesota we expect to observe somewhat higher (more basic) pH in the western parts of the state.
 
 ```{r, echo = FALSE, message=FALSE, warning=FALSE, fig.height=4, fig.asp = 0.6}
+#use function from external ph script (called in previous chunk) to graph ph results
 make_ph_graph(reg, farmer.name)
 ```
 
@@ -181,6 +185,8 @@ make_ph_graph(reg, farmer.name)
 #Phosphorus
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.height=4.5}
+#call separate scripts for P Olsen and P Bray functions.  If else statement determines which results should be displayed based on region (RR region has soil with pH >7.5, Bray test apprporiate there.)
+
 source('./scripts/p_ols_levels.R')
 source('./scripts/p_bray_levels.R')
 
@@ -200,6 +206,7 @@ P is an essential plant macronutrient, as it plays a role in photosynthesis, res
 #Potassium
 
 ```{r, echo = FALSE, message=FALSE, warning=FALSE, fig.height = 4.5}
+#call external potassium script and make graph of potassium data
 source("./scripts/k.R")
 
 make_k_graph(reg, farmer.name)
@@ -211,6 +218,7 @@ Extractable potassium is a measure of potassium (K) availability to the crop. K 
 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.asp = 0.3}
+#A simple table with phosphorus and potassium nutrient levels, sourced from UMN Extension publications.
 
 fert.tbl <- data.frame("Level" = c("   ", "   ", "Very low (VL)", "Low (L)", "Medium (M)", "High (H)", "Very High (VH)"), "P-Bray/Mehlich III" = c("Bray/Mehlich III", "ppm","0-5", "6-11", "12-15", "16-20", "21+"), "P-Olsen" = c("Olsen", "ppm", "0-3", "4-7", "8-11", "12-15", "16+"), "Potassium" = c("   ", "ppm", "0-40", "41-80", "81-120", "121-160", "161+"))
 
@@ -229,6 +237,7 @@ grid.arrange(fert.grob, ncol=1, top = "Relative Nutrient Levels for Phosphorus a
 
 #Potentially Mineralizable Nitrogen (PMN)
 ```{r, echo= FALSE, warning = FALSE, message = FALSE}
+#call potentially mineralizable nitrogen script, make graph with data
 
 source('./scripts/pmn.R')
 
