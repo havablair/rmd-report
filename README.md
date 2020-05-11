@@ -13,7 +13,7 @@ Creating a parameterized report template in R Markdown allowed me to produce ind
 
  ## Getting Started 
 
- Prerequisites:  You need to have R and RStudio installed.  These are both free and there is extensive documentation online about how to do this.  A good starting point:  ["Getting Started with R" by Garrett Grolemund (RStudio Support)] (https://support.rstudio.com/hc/en-us/articles/201141096-Getting-Started-with-R)  
+ Prerequisites:  You need to have R and RStudio installed.  These are both free and there is extensive documentation online about how to do this.  A good starting point:  ["Getting Started with R" by Garrett Grolemund (RStudio Support)](https://support.rstudio.com/hc/en-us/articles/201141096-Getting-Started-with-R)  
 
  ! Note !  Parameterized reports require recent versions of the knitr package (v1.11) and rmarkdown (v0.8) pacakges.  Make sure you have these installed before attempting to run the report.
 
