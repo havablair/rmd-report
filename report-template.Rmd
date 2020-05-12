@@ -14,8 +14,6 @@ params:
 
 ```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
 
-farmer.name <- params$farmer
-reg <- params$region
 report_title <- "Soil Health Project Update"
 
 library(ggplot2)
@@ -112,7 +110,7 @@ grid.arrange(cig.map, grob.actv, ncol=2, top = textGrob("Future Research Activit
 # Research Design 
 ```{r, fig.asp = 0.4, echo =  FALSE, warning = FALSE, message = FALSE}
 #read in aerial field images and legend as pngs
-field.img <- rasterGrob(readPNG(glue("./images/{farmer.name}.png")))
+field.img <- rasterGrob(readPNG(glue("./images/{params$farmer}.png")))
 legend.img <- rasterGrob(readPNG("./images/legend.png"))
 
 fig1 <- multi_panel_figure(
@@ -151,7 +149,7 @@ You can expect results for additional soil health tests in the future.  We curre
 
 source('./scripts/som.R')
 
-make_som_graph(reg, farmer.name)
+make_som_graph(params$region, params$farmer)
 ```
 
 ###What is organic matter?
@@ -177,7 +175,7 @@ As a general rule, in the state of Minnesota we expect to observe somewhat highe
 
 ```{r, echo = FALSE, message=FALSE, warning=FALSE, fig.height=4, fig.asp = 0.6}
 #use function from external ph script (called in previous chunk) to graph ph results
-make_ph_graph(reg, farmer.name)
+make_ph_graph(params$region, params$farmer)
 ```
 
 \newpage
@@ -191,10 +189,10 @@ source('./scripts/p_ols_levels.R')
 source('./scripts/p_bray_levels.R')
 
 
-if (reg == "RR") {
-    make_p_bray(reg, farmer.name)
+if (params$region == "RR") {
+    make_p_bray(params$region, params$farmer)
   } else {
-    make_p_olsen(reg, farmer.name)
+    make_p_olsen(params$region, params$farmer)
   }
 ```
 
@@ -209,7 +207,7 @@ P is an essential plant macronutrient, as it plays a role in photosynthesis, res
 #call external potassium script and make graph of potassium data
 source("./scripts/k.R")
 
-make_k_graph(reg, farmer.name)
+make_k_graph(params$region, params$farmer)
 ```
 
 Extractable potassium is a measure of potassium (K) availability to the crop. K is an essential plant macronutrient that plays a role in photosynthesis, respiration, energy storage and transfer, regulation of water uptake and loss, protein synthesis, activation of growth related enzymes, and other processes. Plants with higher potassium tend to be more tolerant of frost and cold. Thus, good potassium levels may help with season extension. While soil pH only marginally affects K availability, K is easily leached from sandy soils and is only weakly held by increased OM, so that applications of the amount removed by the specific crop being grown are generally necessary in such soils.
@@ -241,7 +239,7 @@ grid.arrange(fert.grob, ncol=1, top = "Relative Nutrient Levels for Phosphorus a
 
 source('./scripts/pmn.R')
 
-make_pmn_graph(reg, farmer.name)
+make_pmn_graph(params$region, params$farmer)
 ```
 
 ###Potentially Mineralizable Nitrogen
