@@ -190,13 +190,13 @@ source('./scripts/p_bray_levels.R')
 
 
 if (params$region == "RR") {
-    make_p_bray(params$region, params$farmer)
-  } else {
     make_p_olsen(params$region, params$farmer)
+  } else {
+    make_p_bray(params$region, params$farmer)
   }
 ```
 
-Extractable phosphorus is a measure of phosphorus (P) availability to a crop.  The type of P test (Bray or Olsen) appropriate for your soil depends on pH.  Following University of Minnesota guidance, we have reported Bray P results for farms with soil pH > 7.5 and Olsen P results for farms with soil pH < 7.5.
+Extractable phosphorus is a measure of phosphorus (P) availability to a crop.  The type of P test (Bray or Olsen) appropriate for your soil depends on pH.  Following University of Minnesota guidance, we have reported Olsen P results for farms with soil pH > 7.5 and Bray P results for farms with soil pH < 7.5.
 
 P is an essential plant macronutrient, as it plays a role in photosynthesis, respiration, energy storage and transfer, cell division, cell enlargement, and several other process in plants. Its availability varies with soil pH and mineral composition. Low P values indicate poor P availability to plants. Excessively high P values indicate a risk of adverse environmental impact. P can be considered a contaminant and runoff of P into fresh surface water will cause damage through eutrophication. For this reason, over-application is strongly discouraged, especially close to surface water, on slopes, and on large scales.  For a general understanding of what constitutes a "Low" or "High" value, see the next page for more information from the University of Minnesota's calibrations.  
 \newpage
